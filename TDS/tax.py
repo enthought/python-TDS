@@ -3,17 +3,24 @@ from suds.client import Client
 
 from TDS.exceptions import TDSConnectionError, TDSResponseError
 
+from .debug import DEBUG_HITS, DEBUG_RESPONSE, DEBUG_TAX
 
 WSDL = 'http://service.taxdatasystems.net/USAddressVerification.svc?WSDL';
 LOCATION = 'http://service.taxdatasystems.net/USAddressVerification.svc/basic';
 
 
 class TaxAPI(object):
-    def __init__(self, login_id, password):
+
+    debug_remaining_hits = DEBUG_HITS
+
+    debug_tax_data = (DEBUG_RESPONSE, DEBUG_TAX)
+
+    def __init__(self, login_id, password, debug=False):
         self.url = WSDL
         self.location = LOCATION
         self.login_id = login_id
         self.password = password
+        self.debug = debug
      
     @property       
     def client(self):
@@ -41,6 +48,9 @@ class TaxAPI(object):
         return response
         
     def get_tax_data(self, address1, citystatezip, address2=None):
+        if self.debug:
+            return self.debug_tax_data
+
         response = self._make_call("GetUSAddressVerificationTaxPlainNetwork",
                     address1, address2, citystatezip)
         tax = {
@@ -53,6 +63,9 @@ class TaxAPI(object):
         return response, tax
         
     def get_remaining_hits(self):
+        if self.debug:
+            return self.debug_remaining_hits
+
         method = getattr(self.client.service, "GetRemainingHitsPlainNetwork")
         response = method(username=self.login_id, password=self.password)
         return response
