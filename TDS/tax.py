@@ -59,6 +59,9 @@ class TaxAPI(object):
             "county_sales_tax": response.ServiceResult.CountySalesTax,
             "state_sales_tax": response.ServiceResult.StateSalesTax,
             "total_sales_tax": response.ServiceResult.TotalSalesTax,
+            "city_reporting_code": response.ServiceResult.CityReportingCode,
+            "county_reporting_code":
+            response.ServiceResult.CountyReportingCode,
         }
         return response, tax
 

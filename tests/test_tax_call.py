@@ -75,7 +75,8 @@ class TestTDSTaxCalls(TestCase):
         # THEN
         expected = [
             'city_sales_tax', 'mta_sales_tax', 'county_sales_tax',
-            'state_sales_tax', 'total_sales_tax',
+            'state_sales_tax', 'total_sales_tax', 'city_reporting_code',
+            'county_reporting_code'
         ]
         self.assertItemsEqual(tax.keys(), expected)
 
