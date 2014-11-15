@@ -1,8 +1,9 @@
 from unittest import TestCase
 import mock
 
-from TDS.tax import TaxAPI
 from TDS.exceptions import TDSResponseError
+from TDS.tax import TaxAPI
+from TDS.utils import convert
 
 
 class TestTDSTaxCalls(TestCase):
@@ -73,11 +74,7 @@ class TestTDSTaxCalls(TestCase):
         _, tax = tax_api.get_tax_data(address1, citystatezip, address2)
 
         # THEN
-        expected = [
-            'city_sales_tax', 'mta_sales_tax', 'county_sales_tax',
-            'state_sales_tax', 'total_sales_tax', 'city_reporting_code',
-            'county_reporting_code'
-        ]
+        expected = [convert(name) for name in tax_api.exposed_tax_fields]
         self.assertItemsEqual(tax.keys(), expected)
 
     def test_get_remaining_hits(self):
