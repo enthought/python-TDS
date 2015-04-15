@@ -1,3 +1,6 @@
+import functools
+import re
+
 from suds import WebFault
 from suds.client import Client
 
@@ -5,8 +8,30 @@ from TDS.exceptions import TDSConnectionError, TDSResponseError
 
 from .utils import convert
 
-WSDL = 'http://service.taxdatasystems.net/USAddressVerification.svc?WSDL'
-LOCATION = 'http://service.taxdatasystems.net/USAddressVerification.svc/basic'
+WSDL = 'https://service.taxdatasystems.net/USAddressVerification.svc?WSDL'
+LOCATION = 'https://service.taxdatasystems.net/USAddressVerification.svc/basic'
+
+
+def remove_hashtags(f):
+    """Remove hashtags from string arguments of wrapped function.
+
+    For some reason, getting the tax info for an address that contains
+    hash signs (e.g. "apartment #5") will cause TDS to fail with a 500
+    internal server error (see GitHub issue #2 for more details). This
+    decorator ensures that any hash signs in the function's arguments
+    are replaced by a reasonable alternative.
+
+    """
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        def _replace_hashtag(arg):
+            if isinstance(arg, basestring):
+                return re.sub('#\s?', 'no. ', arg)
+            else:
+                return arg
+        args = [_replace_hashtag(arg) for arg in args]
+        return f(*args, **kwargs)
+    return wrapper
 
 
 class TaxAPI(object):
@@ -54,6 +79,7 @@ class TaxAPI(object):
             raise e
         return response
 
+    @remove_hashtags
     def get_tax_data(self, address1, citystatezip, address2=None):
 
         response = self._make_call("GetUSAddressVerificationTaxPlainNetwork",
