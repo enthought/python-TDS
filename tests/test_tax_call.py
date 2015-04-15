@@ -77,6 +77,27 @@ class TestTDSTaxCalls(TestCase):
         expected = [convert(name) for name in tax_api.exposed_tax_fields]
         self.assertItemsEqual(tax.keys(), expected)
 
+    def test_get_tax_data_no_hash_tags(self):
+        # GIVEN
+        tax_api = TaxAPI('login_id', 'password')
+        tax_api._client = client = mock.Mock()
+        client.service.GetUSAddressVerificationTaxPlainNetwork.return_value = \
+            response = mock.Mock()
+        response.ServiceStatus.StatusNo = 101
+
+        address1 = 'house #3'
+        address2 = 'apartment # 2'
+        citystatezip = 'City, State, Zip'
+
+        # WHEN
+        response, tax = tax_api.get_tax_data(address1, citystatezip, address2)
+
+        # THEN
+        service = client.service.GetUSAddressVerificationTaxPlainNetwork
+        args, _ = service.call_args
+        self.assertEqual(args,
+                         ('house no. 3', 'apartment no. 2', citystatezip))
+
     def test_get_remaining_hits(self):
         # GIVEN
         tax_api = TaxAPI('login_id', 'password')
