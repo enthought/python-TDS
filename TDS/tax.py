@@ -8,8 +8,8 @@ from TDS.exceptions import TDSConnectionError, TDSResponseError
 
 from .utils import convert
 
-WSDL = 'https://service.taxdatasystems.net/USAddressVerification.svc?WSDL'
-LOCATION = 'https://service.taxdatasystems.net/USAddressVerification.svc/basic'
+WSDL = 'http://service.taxdatasystems.net/USAddressVerification.svc?WSDL'
+LOCATION = 'http://service.taxdatasystems.net/USAddressVerification.svc/basic'
 
 
 def remove_hashtags(f):
@@ -81,7 +81,25 @@ class TaxAPI(object):
 
     @remove_hashtags
     def get_tax_data(self, address1, citystatezip, address2=None):
+        """Retrieve tax information for a given address.
 
+        Parameters
+        ----------
+        address1: str
+            First address line
+        citystatezip: str
+            City, state and zip as a space-separated string.
+        address2: str
+            Second line of the address (if any).
+
+        Returns
+        -------
+        response: object
+            Raw SOAP response
+        tax: dict
+            Tax rates on city and state level.
+
+        """
         response = self._make_call("GetUSAddressVerificationTaxPlainNetwork",
                                    address1, address2, citystatezip)
 
@@ -92,7 +110,14 @@ class TaxAPI(object):
         return response, tax
 
     def get_remaining_hits(self):
+        """Retrieve remaining hits against TDS.
 
+        Returns
+        -------
+        hits: int
+            Number of available hits remaining.
+
+        """
         method = getattr(self.client.service, "GetRemainingHitsPlainNetwork")
         response = method(username=self.login_id, password=self.password)
         return response
