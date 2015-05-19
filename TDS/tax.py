@@ -8,8 +8,8 @@ from TDS.exceptions import TDSConnectionError, TDSResponseError
 
 from .utils import convert
 
-WSDL = 'https://service.taxdatasystems.net/USAddressVerification.svc?WSDL'
-LOCATION = 'https://service.taxdatasystems.net/USAddressVerification.svc/basic'
+WSDL = 'http://service.taxdatasystems.net/USAddressVerification.svc?WSDL'
+LOCATION = 'http://service.taxdatasystems.net/USAddressVerification.svc/basic'
 
 
 def remove_hashtags(f):
